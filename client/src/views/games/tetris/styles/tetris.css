@@ -1,0 +1,99 @@
+.tetris {
+    margin: 0;
+    height: 100vh;
+    width: 100vw;
+}
+
+.tetris.red {
+    background-image: url('matrice-red.gif');
+    background-repeat: repeat;
+}
+.tetris.blue {
+    background-image: url('matrice-blue.gif');
+    background-repeat: repeat;
+}
+
+.texture {
+    border: 0.5px solid #303030;
+    width: 15px;
+    height: 15px;
+}
+
+.nextPiece .texture {
+    border: 0.5px solid black;
+    width: 15px;
+    height: 15px;
+}
+
+.game {
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+}
+.game > .player {
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    background-color: black;
+}
+
+.game > .player.red {
+    border: 2px solid red;
+}
+.game > .player.blue {
+    border: 2px solid blue;
+}
+
+.game > .player > .gameInformations {
+    display: flex;
+    flex-direction: column;
+    color: white;
+}
+
+.game > .player > .gameInformations > .playerName {
+    margin-left: 5px;
+}
+.game > .player > .gameInformations > .score {
+    margin-left: 5px;
+}
+
+.game > .player > .gameInformations > .spacer {
+    flex: 1;
+}
+
+.game > .player > .gameInformations > .nextPiece {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    margin: 5px;
+    padding: 5px;
+    width: 76px;
+    height: 76px;
+    align-items: center;
+    justify-content: center;
+    border: 5px solid black;
+    background-color: black;
+}
+
+.game > .player > .gameInformations > .nextPiece > .line {
+    display: flex;
+    width: fit-content;
+}
+
+.gamezone > .line {
+    display: flex;
+}
+
+.gameover {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    font-size: large;
+    font-weight: bold;
+    color: white;
+}
