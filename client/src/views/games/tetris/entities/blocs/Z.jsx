@@ -6,8 +6,9 @@ function Z({ color, angle }) {
         ]
     if (angle === '90deg' || angle === '270deg')
         return [
-            ['-', color, color],
-            [color, color, '-'],
+            ['-', color],
+            [color, color],
+            [color, '-'],
         ]
 }
 export default Z

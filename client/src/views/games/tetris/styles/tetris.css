@@ -25,45 +25,45 @@
     height: 15px;
 }
 
-.game {
+.tetris .game {
     height: 100vh;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-evenly;
 }
-.game > .player {
+.tetris .game > .player {
     display: flex;
     position: relative;
     flex-direction: row;
     background-color: black;
 }
 
-.game > .player.red {
+.tetris .game > .player.red {
     border: 2px solid red;
 }
-.game > .player.blue {
+.tetris .game > .player.blue {
     border: 2px solid blue;
 }
 
-.game > .player > .gameInformations {
+.tetris .game > .player > .gameInformations {
     display: flex;
     flex-direction: column;
     color: white;
 }
 
-.game > .player > .gameInformations > .playerName {
+.tetris .game > .player > .gameInformations > .playerName {
     margin-left: 5px;
 }
-.game > .player > .gameInformations > .score {
+.tetris .game > .player > .gameInformations > .score {
     margin-left: 5px;
 }
 
-.game > .player > .gameInformations > .spacer {
+.tetris .game > .player > .gameInformations > .spacer {
     flex: 1;
 }
 
-.game > .player > .gameInformations > .nextPiece {
+.tetris .game > .player > .gameInformations > .nextPiece {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
@@ -77,16 +77,16 @@
     background-color: black;
 }
 
-.game > .player > .gameInformations > .nextPiece > .line {
+.tetris .game > .player > .gameInformations > .nextPiece > .line {
     display: flex;
     width: fit-content;
 }
 
-.gamezone > .line {
+.tetris .gamezone > .line {
     display: flex;
 }
 
-.gameover {
+.tetris .gameover {
     display: flex;
     justify-content: center;
     align-items: center;

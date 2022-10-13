@@ -1,0 +1,271 @@
+.pacman {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: black;
+}
+
+.pacman > .player {
+    position: relative;
+    width: fit-content;
+    margin: 0 50px;
+}
+
+.pacman > .player > .player-informations {
+    display: flex;
+    flex-direction: row;
+    color: white;
+    margin: 0 5%;
+    justify-content: space-between;
+}
+
+.pacman > .player .pacman-life {
+    height: 20px;
+    width: 20px;
+    margin: 2.5px;
+    background-color: yellow;
+    border-radius: 50%;
+}
+.pacman > .player .pacman-life > .mouth {
+    height: 100%;
+    width: 100%;
+    background-color: black;
+    border-radius: 50%;
+    clip-path: polygon(105% 74%, 50% 50%, 105% 21%);
+}
+.pacman > .player > .container {
+    height: 10vh;
+}
+
+.pacman > .player > .container > .informations {
+    display: flex;
+    flex-direction: row;
+    color: white;
+    align-items: center;
+    margin-top: 5px;
+    margin: 0 5%;
+    justify-content: space-between;
+}
+
+.pacman > .player > .container > .informations > .lifes {
+    display: flex;
+    flex-direction: row;
+}
+.pacman > .player > .container > .informations > .cherries {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+}
+.pacman > .player > .container > .informations > .cherries > .cherry-picked {
+    width: 25px;
+    height: 25px;
+    background-image: url('../icons/cherry.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.pacman > .player > .container > .gameover {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    font-size: large;
+    font-weight: bold;
+    color: white;
+}
+
+.pacman > .player > .map {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.pacman > .player > .map > .line {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.pacman > .player > .map .empty {
+    height: 25px;
+    width: 25px;
+}
+.pacman > .player > .map .wall {
+    height: 25px;
+    width: 25px;
+    background-color: #0088ff;
+}
+.pacman > .player > .map .door {
+    height: 25px;
+    width: 25px;
+    background-color: brown;
+}
+
+.pacman > .player > .map #pacman {
+    height: 20px;
+    width: 20px;
+    margin: 2.5px;
+    background-color: yellow;
+    border-radius: 50%;
+}
+.pacman #pacman > .mouth {
+    height: 100%;
+    width: 100%;
+    background-color: black;
+    border-radius: 50%;
+    clip-path: polygon(105% 74%, 50% 50%, 105% 21%);
+    animation-name: eat;
+    animation-duration: 0.7s;
+    animation-iteration-count: infinite;
+}
+.pacman #pacman.isInvicible > .mouth {
+    animation-duration: 0.3s;
+}
+
+.pacman #pacman.orientation-left {
+    transform: rotate(180deg);
+}
+.pacman #pacman.orientation-up {
+    transform: rotate(-90deg);
+}
+.pacman #pacman.orientation-down {
+    transform: rotate(90deg);
+}
+
+.pacman #pacman {
+    transition: transform 0.1s linear;
+}
+
+.pacman #pacman.translation.left {
+    transform: translateX(calc(-100% - 5px)) rotate(180deg);
+}
+.pacman #pacman.translation.right {
+    transform: translateX(calc(100% + 5px));
+}
+.pacman #pacman.translation.up {
+    transform: translateY(calc(-100% - 5px)) rotate(-90deg);
+}
+.pacman #pacman.translation.down {
+    transform: translateY(calc(100% + 5px)) rotate(90deg);
+}
+
+.pacman .ghost {
+    position: relative;
+    height: 20px;
+    width: 20px;
+    margin: 2.5px;
+    border-top-left-radius: 50%;
+    border-top-right-radius: 50%;
+}
+
+.pacman .ghost.isVulnerable {
+    animation-name: vulnerableGhost;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+}
+
+.pacman .ghost > .eyes {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-evenly;
+    top: 5px;
+}
+.pacman .ghost > .eyes > .eye {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: white;
+    height: 5px;
+    width: 5px;
+    border-radius: 50%;
+}
+.pacman .ghost > .eyes > .eye > .pupil {
+    background-color: black;
+    margin-left: 2px;
+    height: 2px;
+    width: 2px;
+    border-radius: 50%;
+}
+
+.pacman .ghost > .skirt {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: black;
+    clip-path: polygon(0% 101%, 12.5% 90%, 25% 101%, 37.5% 90%, 50% 101%, 62.5% 90%, 75% 101%, 87.5% 90%, 100% 101%);
+}
+
+.pacman .marble {
+    height: 5px;
+    width: 5px;
+    margin: 10px;
+    border-radius: 50%;
+    background-color: yellow;
+}
+.pacman .ball {
+    height: 15px;
+    width: 15px;
+    margin: 5px;
+    border-radius: 50%;
+    background-color: yellow;
+}
+
+@keyframes eat {
+    0% {
+        clip-path: polygon(105% 74%, 50% 50%, 105% 21%);
+    }
+    25% {
+        clip-path: polygon(105% 60%, 50% 50%, 105% 40%);
+    }
+
+    50% {
+        clip-path: polygon(105% 50%, 50% 50%, 105% 50%);
+    }
+
+    75% {
+        clip-path: polygon(105% 59%, 50% 50%, 105% 35%);
+    }
+
+    100% {
+        clip-path: polygon(105% 74%, 50% 50%, 105% 21%);
+    }
+}
+@keyframes vulnerableGhost {
+    0% {
+        opacity: 1;
+    }
+    25% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 0;
+    }
+    75% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.pacman .cherry {
+    width: 25px;
+    height: 25px;
+    background-color: black;
+}
+
+.pacman .cherry > .icon {
+    width: 20px;
+    height: 20px;
+    margin: 2.5px;
+    background-image: url('../icons/cherry.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+}

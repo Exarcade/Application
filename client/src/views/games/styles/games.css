@@ -1,0 +1,50 @@
+.games {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh;
+    background-image: url('../icons/background.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.games > .title {
+    color: white;
+    width: 35vw;
+    align-self: center;
+}
+.games > .title > img {
+    width: 100%;
+}
+
+.games > .selector {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    margin: 0 25px;
+}
+
+.games > .selector > .game {
+    /* flex: 1; */
+    width: 50vh;
+    height: 50vh;
+    border-radius: 50px;
+    overflow: hidden;
+    border: 10px solid black;
+}
+
+.games > .selector > .game.selected {
+    padding: 0;
+    border: 10px solid #b50000;
+}
+
+.games > .selector > .game#tetris {
+    background-image: url('../icons/tetris.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.games > .selector > .game#pacman {
+    background-image: url('../icons/pacman.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+}

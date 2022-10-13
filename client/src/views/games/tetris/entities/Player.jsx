@@ -5,7 +5,7 @@ import generateRandomBlock from '../utils/NewRandomBlock'
 
 import Texture from './Texture'
 
-function Player({ playerNumber }) {
+function Player({ playerNumber, color }) {
     const defaultGrid = [
         ['-', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
         ['-', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
@@ -43,7 +43,6 @@ function Player({ playerNumber }) {
     const [currentBlock, setCurrentBlock] = useState(generateRandomBlock())
     const [nextBlock, setNextBlock] = useState(generateRandomBlock())
     const [grid, setGrid] = useState(defaultGrid)
-    const [borderColor, setBorderColor] = useState('red')
     const [gameIsOver, setGameOver] = useState(false)
     const [score, setScore] = useState(0)
 
@@ -60,7 +59,7 @@ function Player({ playerNumber }) {
         const onGameStart = ({ detail }) => {
             if (detail.playerNumber === playerNumber) {
                 const { x, y } = blockOrigin
-                currentBlock.forEach((column, indexY) => {
+                currentBlock.block.forEach((column, indexY) => {
                     column.forEach((line, indexX) => {
                         grid[y + indexY][x + indexX] = line
                     })
@@ -85,7 +84,7 @@ function Player({ playerNumber }) {
                 setCurrentBlock(nextBlock)
                 setNextBlock(generateRandomBlock())
                 setBlockOrigin({ x: 4, y: 0 })
-                nextBlock.forEach((column, indexY) => {
+                nextBlock.block.forEach((column, indexY) => {
                     column.forEach((line, indexX) => {
                         newGrid[0 + indexY][4 + indexX] = line
                     })
@@ -113,24 +112,74 @@ function Player({ playerNumber }) {
 
     useEffect(() => {
         const removeCurrent = ({ x, y }) => {
-            currentBlock.forEach((column, indexY) => {
+            currentBlock.block.forEach((column, indexY) => {
                 column.forEach((line, indexX) => {
-                    if (y + indexY === 5) grid[y + indexY][x + indexX] = 'brown'
-                    else grid[y + indexY][x + indexX] = '-'
+                    if (line !== '-') {
+                        if (y + indexY === 5) grid[y + indexY][x + indexX] = 'brown'
+                        else grid[y + indexY][x + indexX] = '-'
+                    }
                 })
             })
+        }
+
+        const canMoveDown = () => {
+            const { x, y } = blockOrigin
+            const CannotMove = {}
+            let canMoveDown = true
+            try {
+                currentBlock.block.forEach((column, indexY) => {
+                    column.forEach((line, indexX) => {
+                        if (line === '-') return
+                        if (y + indexY + 1 > grid.length - 1) throw CannotMove
+                        const current = grid[y + indexY][x + indexX]
+                        const belowBlock = grid[y + indexY + 1][x + indexX]
+                        let isNextBlockPartOfCurrent = false
+                        try {
+                            isNextBlockPartOfCurrent = currentBlock.block[indexY + 1][indexX] !== undefined
+                            if (isNextBlockPartOfCurrent && (currentBlock.block[indexY][indexX] === '-' || currentBlock.block[indexY + 1][indexX] === '-')) throw CannotMove
+                        } catch (ex) {
+                            if (current !== 'brown' && current !== '-' && belowBlock !== 'brown' && belowBlock !== '-') throw CannotMove
+                        }
+                    })
+                })
+            } catch (ex) {
+                canMoveDown = false
+                return canMoveDown
+            }
+            return canMoveDown
+        }
+
+        const moveDown = () => {
+            const { x, y } = blockOrigin
+            removeCurrent(blockOrigin)
+            currentBlock.block.forEach((column, indexY) => {
+                column.forEach((line, indexX) => {
+                    if (line === '-' && y + indexY + 1 === 5) {
+                        grid[y + indexY + 1][x + indexX] = 'brown'
+                    } else {
+                        if (line !== '-') grid[y + indexY + 1][x + indexX] = line
+                    }
+                })
+            })
+            setGrid(grid)
+            setBlockOrigin({ x: x, y: y + 1 })
         }
 
         const canMoveLeft = () => {
             const { x, y } = blockOrigin
             const CannotMove = {}
             try {
-                currentBlock.forEach((column, indexY) => {
+                currentBlock.block.forEach((column, indexY) => {
                     column.forEach((line, indexX) => {
+                        if (x + indexX - 1 < 0) throw CannotMove
                         const current = grid[y + indexY][x + indexX]
                         const belowBlock = grid[y + indexY][x + indexX - 1]
-                        if (current !== '-' && current !== 'brown' && belowBlock !== '-' && belowBlock !== 'brown') {
-                            if (currentBlock[indexY][indexX - 1] === undefined || currentBlock[indexY][indexX - 1] === '-') throw CannotMove
+                        let isNextBlockPartOfCurrent = false
+                        try {
+                            isNextBlockPartOfCurrent = currentBlock.block[indexY][indexX - 1] !== undefined
+                            if (!isNextBlockPartOfCurrent) throw CannotMove
+                        } catch (ex) {
+                            if (current !== 'brown' && current !== '-' && belowBlock !== 'brown' && belowBlock !== '-') throw CannotMove
                         }
                     })
                 })
@@ -144,7 +193,7 @@ function Player({ playerNumber }) {
             if (canMoveLeft()) {
                 const { x, y } = blockOrigin
                 removeCurrent(blockOrigin)
-                currentBlock.forEach((column, indexY) => {
+                currentBlock.block.forEach((column, indexY) => {
                     column.forEach((line, indexX) => {
                         if (line === '-' && y + indexY === 5) {
                             grid[y + indexY][x + indexX - 1] = 'brown'
@@ -162,12 +211,17 @@ function Player({ playerNumber }) {
             const { x, y } = blockOrigin
             const CannotMove = {}
             try {
-                currentBlock.forEach((column, indexY) => {
+                currentBlock.block.forEach((column, indexY) => {
                     column.forEach((line, indexX) => {
+                        if (x + indexX + 1 > grid[y + indexY].length - 1) throw CannotMove
                         const current = grid[y + indexY][x + indexX]
                         const belowBlock = grid[y + indexY][x + indexX + 1]
-                        if (current !== '-' && current !== 'brown' && belowBlock !== '-' && belowBlock !== 'brown') {
-                            if (currentBlock[indexY][indexX + 1] === undefined || currentBlock[indexY][indexX + 1] === '-') throw CannotMove
+                        let isNextBlockPartOfCurrent = false
+                        try {
+                            isNextBlockPartOfCurrent = currentBlock.block[indexY][indexX + 1] !== undefined
+                            if (!isNextBlockPartOfCurrent) throw CannotMove
+                        } catch (ex) {
+                            if (current !== 'brown' && current !== '-' && belowBlock !== 'brown' && belowBlock !== '-') throw CannotMove
                         }
                     })
                 })
@@ -181,7 +235,7 @@ function Player({ playerNumber }) {
             if (canMoveRight()) {
                 const { x, y } = blockOrigin
                 removeCurrent(blockOrigin)
-                currentBlock.forEach((column, indexY) => {
+                currentBlock.block.forEach((column, indexY) => {
                     column.forEach((line, indexX) => {
                         if (line === '-' && y + indexY === 5) {
                             grid[y + indexY][x + indexX + 1] = 'brown'
@@ -195,42 +249,32 @@ function Player({ playerNumber }) {
             }
         }
 
-        const canMoveDown = () => {
-            const { x, y } = blockOrigin
-            const CannotMove = {}
-            try {
-                currentBlock.forEach((column, indexY) => {
-                    column.forEach((line, indexX) => {
-                        const current = grid[y + indexY][x + indexX]
-                        const belowBlock = grid[y + indexY + 1][x + indexX]
-                        if (current !== '-' && current !== 'brown' && belowBlock !== '-' && belowBlock !== 'brown') {
-                            if (currentBlock[indexY + 1][indexX] === undefined || currentBlock[indexY + 1][indexX] === '-') throw CannotMove
-                        }
-                    })
-                })
-            } catch (ex) {
-                return false
-            }
-            return true
-        }
-
-        const moveDown = () => {
-            const { x, y } = blockOrigin
+        const onRotateLeft = () => {
+            let angle = currentBlock.angle.replace('deg', '') - 90
+            if (angle < 0) angle = 270
+            const newBlock = currentBlock.generator({ color: currentBlock.color, angle: angle + 'deg' })
             removeCurrent(blockOrigin)
-            currentBlock.forEach((column, indexY) => {
-                column.forEach((line, indexX) => {
-                    if (line === '-' && y + indexY + 1 === 5) {
-                        grid[y + indexY + 1][x + indexX] = 'brown'
-                    } else {
-                        if (line !== '-') grid[y + indexY + 1][x + indexX] = line
-                    }
-                })
+            setCurrentBlock({
+                block: newBlock,
+                angle: angle + 'deg',
+                color: currentBlock.color,
+                generator: currentBlock.generator,
             })
-            setGrid(grid)
-            setBlockOrigin({ x: x, y: y + 1 })
+        }
+        const onRotateRight = () => {
+            let angle = currentBlock.angle.replace('deg', '') + 90
+            if (angle > 270) angle = 0
+            const newBlock = currentBlock.generator({ color: currentBlock.color, angle: angle + 'deg' })
+            removeCurrent(blockOrigin)
+            setCurrentBlock({
+                block: newBlock,
+                angle: angle + 'deg',
+                color: currentBlock.color,
+                generator: currentBlock.generator,
+            })
         }
 
-        const onGameTicking = () => {
+        function onGameTicking() {
             if (!canMoveDown()) {
                 if (blockOrigin.y < 5) {
                     const GameOver = new CustomEvent('GameOver', { detail: { playerNumber } })
@@ -245,33 +289,36 @@ function Player({ playerNumber }) {
         }
 
         const onDirectionEvent = ({ detail }) => {
-            if (detail.orientations.includes('left')) onMoveLeft()
-            if (detail.orientations.includes('right')) onMoveRight()
+            if (detail.player === playerNumber) {
+                if (detail.orientations.includes('left')) onMoveLeft()
+                if (detail.orientations.includes('right')) onMoveRight()
+            }
         }
+        const onActionEvent = ({ detail }) => {
+            if (detail.player === playerNumber) {
+                if (detail.type === 'A') onRotateLeft()
+                if (detail.type === 'B') onRotateRight()
+            }
+        }
+
         const gameTick = setTimeout(onGameTicking, 200)
         if (!gameIsOver) {
             document.addEventListener('direction', onDirectionEvent)
+            document.addEventListener('action', onActionEvent)
         }
         return () => {
             clearTimeout(gameTick)
             document.removeEventListener('direction', onDirectionEvent)
+            document.removeEventListener('action', onActionEvent)
         }
     }, [grid, currentBlock, blockOrigin, isRunning, gameIsOver, playerNumber])
 
-    useEffect(() => {
-        const switchBorderColor = () => {
-            if (borderColor === 'red') setBorderColor('blue')
-            else setBorderColor('red')
-        }
-        setTimeout(switchBorderColor, 5000)
-    }, [borderColor])
-
     return (
-        <div className={'player ' + borderColor}>
+        <div className={'player ' + color}>
             <div className="gameInformations">
                 <div className="playerName">Joueur {playerNumber}</div>
                 <div className="nextPiece">
-                    {nextBlock.map((line, index) => {
+                    {nextBlock.block.map((line, index) => {
                         return (
                             <div key={index} className="line">
                                 {line.map((texture, index) => (

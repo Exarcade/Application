@@ -1,59 +1,94 @@
 const express = require('express')
 const app = express()
 var path = require('path')
-const http = require('http').createServer(app)
-const io = require('socket.io')(http)
+const cors = require('cors')
+const http = require('http')
+const httpServer = http.createServer(app)
+const io = require('socket.io')(httpServer, {
+    cors: {
+        origin: '*',
+    },
+})
 
-let appSocket = null
+const { exec } = require('child_process')
 
-const servers = []
-const clients = []
+exec('echo test', (error, stdout, stderr) => {
+    if (error) {
+        console.log('error :', error)
+        return
+    }
+    if (stderr) {
+        console.log('error :', error)
+        return
+    }
+    console.log('Résultat :', stdout)
+})
 
 app.use(express.json())
-app.use(express.static('client/build'))
-// app.use(express.urlencoded())
+app.use(
+    cors({
+        origin: '*',
+    })
+)
+// app.use(express.static('../client/build'))
+
+app.get('/api/clients', (req, res) => {
+    let clients = Array.from(io.sockets.adapter.rooms.get('clients') ?? [])
+    res.json({ clients: clients, amount: clients.length })
+})
+
+app.get('/api/servers', (req, res) => {
+    let clients = Array.from(io.sockets.adapter.rooms.get('servers') ?? [])
+    res.json({ servers: clients, amount: clients.length })
+})
+
+app.get('/api/sounds/tetris', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'tetris-theme.mp3'))
+})
+app.get('/api/sounds/pacman', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'pacman-theme.mp3'))
+})
+
+app.get('*.*', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'client', 'build', req.url))
+})
 
 app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '..', 'client', 'build', 'index.html'))
+    res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'))
 })
-
-// app.post('/api/direction', (req, res) => {
-//     const { orientations } = req.body
-//     if (appSocket != null) {
-//         appSocket.emit('direction', orientations)
-//     }
-//     res.send('success')
-// })
-
-// app.post('/api/action', (req, res) => {
-//     const { type } = req.body
-//     if (appSocket != null) {
-//         appSocket.emit('action', type)
-//     }
-//     res.send('success')
-// })
 
 io.on('connection', function (newSocket) {
-    newSocket.on('server', function (socket) {
-        servers.push(socket)
-    })
+    newSocket.on('server', function () {
+        newSocket.join('servers')
 
-    newSocket.on('player', function (socket) {
-        clients.push(socket)
-        socket.on('direction', (direction) => {
-            servers.emit('direction', direction)
-        })
-        socket.on('action', (action) => {
-            servers.emit('action', action)
+        newSocket.on('game', function ({ name }) {
+            io.to('clients').emit('sound', name)
         })
     })
 
-    newSocket.on('disconnect', (socket) => {
-        if (clients.includes(socket)) clients.splice(clients.indexOf(socket), 1)
-        if (servers.includes(socket)) servers.splice(servers.indexOf(socket), 1)
+    newSocket.on('client', function () {
+        newSocket.join('clients')
+
+        io.to('servers').emit('newPlayer')
+
+        newSocket.on('direction', (direction) => {
+            const clients = Array.from(io.sockets.adapter.rooms.get('clients') ?? [])
+            const playerNumber = clients.indexOf(newSocket.id) + 1
+            io.to('servers').emit('direction', { ...direction, player: playerNumber })
+        })
+        newSocket.on('action', (action) => {
+            const clients = Array.from(io.sockets.adapter.rooms.get('clients') ?? [])
+            const playerNumber = clients.indexOf(newSocket.id) + 1
+            io.to('servers').emit('action', { ...action, player: playerNumber })
+        })
+    })
+
+    newSocket.on('disconnecting', () => {
+        newSocket.leave('servers')
+        newSocket.leave('clients')
     })
 })
 
-http.listen(3000, function () {
+httpServer.listen(3000, function () {
     console.log('listening on *:3000')
 })

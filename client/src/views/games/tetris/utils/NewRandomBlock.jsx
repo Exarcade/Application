@@ -49,30 +49,43 @@ function generateRandomBlock() {
     }
 
     let randomBlock = null
+    let generator = null
     switch (randomBlockNumber) {
         case 0:
             randomBlock = I({ color, angle })
+            generator = I
             break
         case 1:
             randomBlock = L({ color, angle })
+            generator = L
             break
         case 2:
             randomBlock = LReverse({ color, angle })
+            generator = LReverse
             break
         case 3:
             randomBlock = S({ color, angle })
+            generator = S
             break
         case 4:
             randomBlock = Square({ color })
+            generator = Square
             break
         case 5:
             randomBlock = T({ color, angle })
+            generator = T
             break
         default:
             randomBlock = Z({ color, angle })
+            generator = Z
             break
     }
-    return randomBlock
+    return {
+        angle: angle,
+        block: randomBlock,
+        color: color,
+        generator: generator,
+    }
 }
 
 export default generateRandomBlock
