@@ -4,6 +4,7 @@ var path = require('path')
 const cors = require('cors')
 const http = require('http')
 const httpServer = http.createServer(app)
+
 const io = require('socket.io')(httpServer, {
     cors: {
         origin: '*',
@@ -12,24 +13,14 @@ const io = require('socket.io')(httpServer, {
 
 const { exec } = require('child_process')
 
-exec('echo test', (error, stdout, stderr) => {
-    if (error) {
-        console.log('error :', error)
-        return
-    }
-    if (stderr) {
-        console.log('error :', error)
-        return
-    }
-    console.log('Résultat :', stdout)
-})
-
 app.use(express.json())
 app.use(
     cors({
         origin: '*',
     })
 )
+
+let currentLightStatus = true
 // app.use(express.static('../client/build'))
 
 app.get('/api/clients', (req, res) => {
@@ -40,6 +31,22 @@ app.get('/api/clients', (req, res) => {
 app.get('/api/servers', (req, res) => {
     let clients = Array.from(io.sockets.adapter.rooms.get('servers') ?? [])
     res.json({ servers: clients, amount: clients.length })
+})
+
+app.get('/api/lights', (req, res) => {
+    const status = currentLightStatus
+    res.json({ status })
+})
+
+app.post('/api/lights', (req, res) => {
+    const { status } = req.body
+    if (status === true) {
+        exec('sudo uhubctl -l 1-1 -a 1')
+    } else {
+        exec('sudo uhubctl -l 1-1 -a 0')
+    }
+    io.to('clients').emit('lights_update', status)
+    res.json({ status })
 })
 
 app.get('/api/sounds/tetris', (req, res) => {
